@@ -26,15 +26,12 @@ SECRET_KEY = os.environ.get(
     "django-insecure-gu5@2+#w(nw6o3r6@t0!+gq27z+y_44pa+vqba1)bzq1yasnfv"
 )
 
-DEBUG = os.environ.get("DEBUG", "True").strip().lower() in {
-    "1", "true", "yes", "on"
-}
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS",
     "localhost,127.0.0.1"
 ).split(",")
-ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
 
 
 # ============================================================
@@ -194,7 +191,7 @@ USE_TZ = True
 # STATIC FILES
 # ============================================================
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -219,4 +216,5 @@ AUTH_USER_MODEL = 'users.User'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://hireflow-frontend-eight.vercel.app",
 ]
