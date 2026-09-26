@@ -217,4 +217,5 @@ AUTH_USER_MODEL = 'users.User'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://hireflow-frontend-eight.vercel.app",
+    "https://hireflow-frontend-1.vercel.app",
 ]
