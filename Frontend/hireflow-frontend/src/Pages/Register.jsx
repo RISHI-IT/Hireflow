@@ -1,14 +1,64 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../api/api";
 
 export default function Register() {
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    role: "job_seeker",
+  });
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  function handleChange(e) {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    navigate("/candidate/dashboard");
+    setError("");
+    setLoading(true);
+
+    try {
+      await api.post("register/", formData);
+
+      alert("Account created successfully!");
+
+      navigate("/login");
+    } catch (err) {
+      console.error("Registration error:", err);
+
+      if (err.response?.data) {
+        const data = err.response.data;
+
+        if (data.username) {
+          setError(data.username[0]);
+        } else if (data.email) {
+          setError(data.email[0]);
+        } else if (data.password) {
+          setError(data.password[0]);
+        } else if (data.detail) {
+          setError(data.detail);
+        } else {
+          setError("Unable to create account. Please check your details.");
+        }
+      } else {
+        setError("Unable to connect to the server.");
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -51,28 +101,40 @@ export default function Register() {
 
             <input
               required
-              placeholder="Full name"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Username"
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 outline-none focus:border-white/30"
             />
 
             <input
               required
+              name="email"
               type="email"
+              value={formData.email}
+              onChange={handleChange}
               placeholder="Email address"
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 outline-none focus:border-white/30"
             />
 
             <input
               required
+              name="password"
               type="password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="Create password"
               className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 outline-none focus:border-white/30"
             />
 
             <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
               className="w-full rounded-xl border border-white/10 bg-[#0a0a0a] px-4 py-3.5 text-zinc-300 outline-none focus:border-white/30"
             >
-              <option value="candidate">
+              <option value="job_seeker">
                 I am looking for a job
               </option>
 
@@ -81,11 +143,18 @@ export default function Register() {
               </option>
             </select>
 
+            {error && (
+              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                {error}
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full rounded-xl bg-white py-3.5 font-semibold text-black transition hover:bg-zinc-200"
+              disabled={loading}
+              className="w-full rounded-xl bg-white py-3.5 font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Create account
+              {loading ? "Creating account..." : "Create account"}
             </button>
 
           </form>
